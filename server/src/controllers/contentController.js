@@ -1,7 +1,9 @@
 import { cloudinary } from "../config/cloudinary.js";
+import mongoose from "mongoose";
 import { ArchiveArticle } from "../models/ArchiveArticle.js";
 import { ArchiveVolume } from "../models/ArchiveVolume.js";
 import { Article } from "../models/Article.js";
+import { ArticleInPress } from "../models/ArticleInPress.js";
 import { BoardMember } from "../models/BoardMember.js";
 import { CurrentIssue } from "../models/CurrentIssue.js";
 import { CurrentIssueArticle } from "../models/CurrentIssueArticle.js";
@@ -30,6 +32,15 @@ const safeDestroy = async (publicId, resourceType) => {
   await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
 };
 
+const getValidatedObjectId = (id, resourceLabel = "Resource") => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error(`Invalid ${resourceLabel} id`);
+    err.statusCode = 400;
+    throw err;
+  }
+  return id;
+};
+
 export const listArticles = asyncHandler(async (req, res) => {
   const query = req.query.journal_id ? { journal_id: req.query.journal_id } : {};
   const articles = await Article.find(query).sort({ createdAt: -1 });
@@ -37,7 +48,7 @@ export const listArticles = asyncHandler(async (req, res) => {
 });
 
 export const getArticle = asyncHandler(async (req, res) => {
-  const article = await Article.findById(req.params.id);
+  const article = await Article.findById(getValidatedObjectId(req.params.id, "article"));
   if (!article) return res.status(404).json({ message: "Article not found" });
   res.status(200).json({ article });
 });
@@ -58,7 +69,7 @@ export const createArticle = asyncHandler(async (req, res) => {
 });
 
 export const updateArticle = asyncHandler(async (req, res) => {
-  const article = await Article.findById(req.params.id);
+  const article = await Article.findById(getValidatedObjectId(req.params.id, "article"));
   if (!article) return res.status(404).json({ message: "Article not found" });
 
   Object.assign(article, req.body);
@@ -77,11 +88,44 @@ export const updateArticle = asyncHandler(async (req, res) => {
 });
 
 export const deleteArticle = asyncHandler(async (req, res) => {
-  const article = await Article.findById(req.params.id);
+  const article = await Article.findById(getValidatedObjectId(req.params.id, "article"));
   if (!article) return res.status(404).json({ message: "Article not found" });
   await safeDestroy(article.pdf_public_id, "raw");
+  await ArticleInPress.deleteMany({ article_id: article._id });
   await article.deleteOne();
   res.status(200).json({ message: "Article deleted" });
+});
+
+export const listArticlesInPress = asyncHandler(async (req, res) => {
+  const query = req.query.journal_id ? { journal_id: req.query.journal_id } : {};
+  const inPressLinks = await ArticleInPress.find(query).populate("article_id");
+  const articles = inPressLinks.map(link => link.article_id).filter(Boolean);
+  res.status(200).json({ articles });
+});
+
+export const createArticleInPress = asyncHandler(async (req, res) => {
+  const { journal_id, article_id } = req.body;
+  
+  if (!article_id) {
+    return res.status(400).json({ message: "article_id is required" });
+  }
+
+  // Check if article already marked as in press
+  const existing = await ArticleInPress.findOne({ article_id });
+  if (existing) {
+    return res.status(400).json({ message: "Article is already marked as in press" });
+  }
+
+  const inPress = await ArticleInPress.create({ journal_id, article_id });
+  await inPress.populate("article_id");
+  res.status(201).json({ inPress });
+});
+
+export const deleteArticleInPress = asyncHandler(async (req, res) => {
+  const inPress = await ArticleInPress.findById(getValidatedObjectId(req.params.id, "article in press"));
+  if (!inPress) return res.status(404).json({ message: "Article in press not found" });
+  await inPress.deleteOne();
+  res.status(200).json({ message: "Article removed from in press" });
 });
 
 export const listBoardMembers = asyncHandler(async (req, res) => {
@@ -91,7 +135,7 @@ export const listBoardMembers = asyncHandler(async (req, res) => {
 });
 
 export const getBoardMember = asyncHandler(async (req, res) => {
-  const member = await BoardMember.findById(req.params.id);
+  const member = await BoardMember.findById(getValidatedObjectId(req.params.id, "board member"));
   if (!member) return res.status(404).json({ message: "Board member not found" });
   res.status(200).json({ member });
 });
@@ -111,7 +155,7 @@ export const createBoardMember = asyncHandler(async (req, res) => {
 });
 
 export const updateBoardMember = asyncHandler(async (req, res) => {
-  const member = await BoardMember.findById(req.params.id);
+  const member = await BoardMember.findById(getValidatedObjectId(req.params.id, "board member"));
   if (!member) return res.status(404).json({ message: "Board member not found" });
 
   Object.assign(member, req.body);
@@ -130,7 +174,7 @@ export const updateBoardMember = asyncHandler(async (req, res) => {
 });
 
 export const deleteBoardMember = asyncHandler(async (req, res) => {
-  const member = await BoardMember.findById(req.params.id);
+  const member = await BoardMember.findById(getValidatedObjectId(req.params.id, "board member"));
   if (!member) return res.status(404).json({ message: "Board member not found" });
   await safeDestroy(member.image_public_id, "image");
   await member.deleteOne();
@@ -138,18 +182,51 @@ export const deleteBoardMember = asyncHandler(async (req, res) => {
 });
 
 const attachIssueArticles = async (issues) => {
-  const issueIds = issues.map((i) => i._id);
-  const links = await CurrentIssueArticle.find({ issue_id: { $in: issueIds } }).populate("article_id");
-  const map = new Map();
-  links.forEach((link) => {
-    const key = String(link.issue_id);
-    if (!map.has(key)) map.set(key, []);
-    map.get(key).push(link.article_id);
-  });
-  return issues.map((issue) => ({
-    ...issue.toObject(),
-    article_items: map.get(String(issue._id)) || []
-  }));
+  return Promise.all(
+    issues.map(async (issue) => {
+      const obj = issue.toObject();
+      obj.volume_items = [];
+      obj.article_items = [];
+
+      if (obj.archive_volume_ids?.length) {
+        const volumes = await ArchiveVolume.find({ _id: { $in: obj.archive_volume_ids } }).sort({
+          year: -1,
+          createdAt: -1
+        });
+
+        obj.volume_items = await attachArchiveArticles(volumes);
+        obj.article_items = obj.volume_items.flatMap((volume) => volume.article_items || []);
+      } else {
+        const issueIds = [issue._id];
+        const links = await CurrentIssueArticle.find({ issue_id: { $in: issueIds } }).populate("article_id");
+        obj.article_items = links.map((link) => link.article_id).filter(Boolean);
+
+        if (!obj.article_items.length) {
+          const issueText = String(obj.volume_title || "").toLowerCase();
+          const yearMatch = issueText.match(/\b(19|20)\d{2}\b/);
+          const archiveVolumes = await ArchiveVolume.find(
+            obj.journal_id ? { journal_id: obj.journal_id } : {}
+          ).sort({ year: -1, createdAt: -1 });
+
+          const matchedVolumes = archiveVolumes.filter((volume) => {
+            const volumeTitle = String(volume.volume_title || "").toLowerCase();
+            return (
+              issueText.includes(volumeTitle) ||
+              volumeTitle.includes(issueText) ||
+              (yearMatch && String(volume.year) === yearMatch[0])
+            );
+          });
+
+          if (matchedVolumes.length) {
+            obj.volume_items = await attachArchiveArticles(matchedVolumes);
+            obj.article_items = obj.volume_items.flatMap((volume) => volume.article_items || []);
+          }
+        }
+      }
+
+      return obj;
+    })
+  );
 };
 
 export const listCurrentIssues = asyncHandler(async (req, res) => {
@@ -160,55 +237,44 @@ export const listCurrentIssues = asyncHandler(async (req, res) => {
 });
 
 export const getCurrentIssue = asyncHandler(async (req, res) => {
-  const issue = await CurrentIssue.findById(req.params.id);
+  const issue = await CurrentIssue.findById(getValidatedObjectId(req.params.id, "current issue"));
   if (!issue) return res.status(404).json({ message: "Current issue not found" });
   const hydrated = await attachIssueArticles([issue]);
   res.status(200).json({ issue: hydrated[0] });
 });
 
 export const createCurrentIssue = asyncHandler(async (req, res) => {
+  const archive_volume_ids = parseIds(req.body.archive_volume_ids || []);
   const issue = await CurrentIssue.create({
     journal_id: req.body.journal_id,
-    volume_title: req.body.volume_title
+    volume_title: req.body.volume_title,
+    archive_volume_ids
   });
-
-  const article_ids = parseIds(req.body.article_ids);
-  if (article_ids.length) {
-    await CurrentIssueArticle.insertMany(
-      article_ids.map((article_id) => ({ issue_id: issue._id, article_id }))
-    );
-  }
 
   const hydrated = await attachIssueArticles([issue]);
   res.status(201).json({ issue: hydrated[0] });
 });
 
 export const updateCurrentIssue = asyncHandler(async (req, res) => {
-  const issue = await CurrentIssue.findById(req.params.id);
+  const issue = await CurrentIssue.findById(getValidatedObjectId(req.params.id, "current issue"));
   if (!issue) return res.status(404).json({ message: "Current issue not found" });
 
-  if (req.body.journal_id) issue.journal_id = req.body.journal_id;
   if (req.body.volume_title) issue.volume_title = req.body.volume_title;
-  await issue.save();
-
-  if (Object.prototype.hasOwnProperty.call(req.body, "article_ids")) {
-    const article_ids = parseIds(req.body.article_ids);
-    await CurrentIssueArticle.deleteMany({ issue_id: issue._id });
-    if (article_ids.length) {
-      await CurrentIssueArticle.insertMany(
-        article_ids.map((article_id) => ({ issue_id: issue._id, article_id }))
-      );
-    }
+  
+  if (Object.prototype.hasOwnProperty.call(req.body, "archive_volume_ids")) {
+    const archive_volume_ids = parseIds(req.body.archive_volume_ids || []);
+    issue.archive_volume_ids = archive_volume_ids;
   }
+  
+  await issue.save();
 
   const hydrated = await attachIssueArticles([issue]);
   res.status(200).json({ issue: hydrated[0] });
 });
 
 export const deleteCurrentIssue = asyncHandler(async (req, res) => {
-  const issue = await CurrentIssue.findById(req.params.id);
+  const issue = await CurrentIssue.findById(getValidatedObjectId(req.params.id, "current issue"));
   if (!issue) return res.status(404).json({ message: "Current issue not found" });
-  await CurrentIssueArticle.deleteMany({ issue_id: issue._id });
   await issue.deleteOne();
   res.status(200).json({ message: "Current issue deleted" });
 });
@@ -236,7 +302,7 @@ export const listArchiveVolumes = asyncHandler(async (req, res) => {
 });
 
 export const getArchiveVolume = asyncHandler(async (req, res) => {
-  const volume = await ArchiveVolume.findById(req.params.id);
+  const volume = await ArchiveVolume.findById(getValidatedObjectId(req.params.id, "archive volume"));
   if (!volume) return res.status(404).json({ message: "Archive volume not found" });
   const hydrated = await attachArchiveArticles([volume]);
   res.status(200).json({ volume: hydrated[0] });
@@ -261,7 +327,7 @@ export const createArchiveVolume = asyncHandler(async (req, res) => {
 });
 
 export const updateArchiveVolume = asyncHandler(async (req, res) => {
-  const volume = await ArchiveVolume.findById(req.params.id);
+  const volume = await ArchiveVolume.findById(getValidatedObjectId(req.params.id, "archive volume"));
   if (!volume) return res.status(404).json({ message: "Archive volume not found" });
 
   if (req.body.journal_id) volume.journal_id = req.body.journal_id;
@@ -284,7 +350,7 @@ export const updateArchiveVolume = asyncHandler(async (req, res) => {
 });
 
 export const deleteArchiveVolume = asyncHandler(async (req, res) => {
-  const volume = await ArchiveVolume.findById(req.params.id);
+  const volume = await ArchiveVolume.findById(getValidatedObjectId(req.params.id, "archive volume"));
   if (!volume) return res.status(404).json({ message: "Archive volume not found" });
   await ArchiveArticle.deleteMany({ volume_id: volume._id });
   await volume.deleteOne();
@@ -298,25 +364,48 @@ export const listVideos = asyncHandler(async (req, res) => {
 });
 
 export const getVideo = asyncHandler(async (req, res) => {
-  const video = await Video.findById(req.params.id);
+  const video = await Video.findById(getValidatedObjectId(req.params.id, "video"));
   if (!video) return res.status(404).json({ message: "Video not found" });
   res.status(200).json({ video });
 });
 
 export const createVideo = asyncHandler(async (req, res) => {
-  const video = await Video.create(req.body);
+  const payload = { ...req.body };
+  if (req.file?.buffer) {
+    const upload = await uploadBufferToCloudinary(req.file.buffer, {
+      folder: "journals/videos/thumbnails",
+      resource_type: "image"
+    });
+    payload.thumbnail_url = upload.secure_url;
+    payload.thumbnail_public_id = upload.public_id;
+  }
+  const video = await Video.create(payload);
   res.status(201).json({ video });
 });
 
 export const updateVideo = asyncHandler(async (req, res) => {
-  const video = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+  const video = await Video.findById(getValidatedObjectId(req.params.id, "video"));
   if (!video) return res.status(404).json({ message: "Video not found" });
+
+  Object.assign(video, req.body);
+  if (req.file?.buffer) {
+    const upload = await uploadBufferToCloudinary(req.file.buffer, {
+      folder: "journals/videos/thumbnails",
+      resource_type: "image"
+    });
+    await safeDestroy(video.thumbnail_public_id, "image");
+    video.thumbnail_url = upload.secure_url;
+    video.thumbnail_public_id = upload.public_id;
+  }
+
+  await video.save();
   res.status(200).json({ video });
 });
 
 export const deleteVideo = asyncHandler(async (req, res) => {
-  const video = await Video.findById(req.params.id);
+  const video = await Video.findById(getValidatedObjectId(req.params.id, "video"));
   if (!video) return res.status(404).json({ message: "Video not found" });
+  await safeDestroy(video.thumbnail_public_id, "image");
   await video.deleteOne();
   res.status(200).json({ message: "Video deleted" });
 });
@@ -328,45 +417,72 @@ export const listPpts = asyncHandler(async (req, res) => {
 });
 
 export const getPpt = asyncHandler(async (req, res) => {
-  const ppt = await Ppt.findById(req.params.id);
+  const ppt = await Ppt.findById(getValidatedObjectId(req.params.id, "ppt"));
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
   res.status(200).json({ ppt });
 });
 
 export const createPpt = asyncHandler(async (req, res) => {
-  if (!req.file?.buffer) {
+  const pptFile = req.files?.file?.[0];
+  const thumbnailFile = req.files?.thumbnail?.[0];
+
+  if (!pptFile) {
     return res.status(400).json({ message: "PPT/PDF file is required" });
   }
 
-  const upload = await uploadBufferToCloudinary(req.file.buffer, {
+  const upload = await uploadBufferToCloudinary(pptFile.buffer, {
     folder: "journals/ppts",
     resource_type: "raw"
   });
 
-  const ppt = await Ppt.create({
+  const payload = {
     ...req.body,
     file_url: upload.secure_url,
     file_public_id: upload.public_id,
-    format: req.file.mimetype
-  });
+    format: pptFile.mimetype
+  };
 
+  if (thumbnailFile) {
+    const thumbUpload = await uploadBufferToCloudinary(thumbnailFile.buffer, {
+      folder: "journals/ppts/thumbnails",
+      resource_type: "image"
+    });
+    payload.thumbnail_url = thumbUpload.secure_url;
+    payload.thumbnail_public_id = thumbUpload.public_id;
+  }
+
+  const ppt = await Ppt.create(payload);
   res.status(201).json({ ppt });
 });
 
 export const updatePpt = asyncHandler(async (req, res) => {
-  const ppt = await Ppt.findById(req.params.id);
+  const ppt = await Ppt.findById(getValidatedObjectId(req.params.id, "ppt"));
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
 
   Object.assign(ppt, req.body);
-  if (req.file?.buffer) {
-    const upload = await uploadBufferToCloudinary(req.file.buffer, {
+
+  const pptFile = req.files?.file?.[0];
+  const thumbnailFile = req.files?.thumbnail?.[0];
+
+  if (pptFile) {
+    const upload = await uploadBufferToCloudinary(pptFile.buffer, {
       folder: "journals/ppts",
       resource_type: "raw"
     });
     await safeDestroy(ppt.file_public_id, "raw");
     ppt.file_url = upload.secure_url;
     ppt.file_public_id = upload.public_id;
-    ppt.format = req.file.mimetype;
+    ppt.format = pptFile.mimetype;
+  }
+
+  if (thumbnailFile) {
+    const thumbUpload = await uploadBufferToCloudinary(thumbnailFile.buffer, {
+      folder: "journals/ppts/thumbnails",
+      resource_type: "image"
+    });
+    await safeDestroy(ppt.thumbnail_public_id, "image");
+    ppt.thumbnail_url = thumbUpload.secure_url;
+    ppt.thumbnail_public_id = thumbUpload.public_id;
   }
 
   await ppt.save();
@@ -374,9 +490,10 @@ export const updatePpt = asyncHandler(async (req, res) => {
 });
 
 export const deletePpt = asyncHandler(async (req, res) => {
-  const ppt = await Ppt.findById(req.params.id);
+  const ppt = await Ppt.findById(getValidatedObjectId(req.params.id, "ppt"));
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
   await safeDestroy(ppt.file_public_id, "raw");
+  await safeDestroy(ppt.thumbnail_public_id, "image");
   await ppt.deleteOne();
   res.status(200).json({ message: "PPT deleted" });
 });
@@ -387,7 +504,7 @@ export const listTestimonials = asyncHandler(async (req, res) => {
 });
 
 export const getTestimonial = asyncHandler(async (req, res) => {
-  const testimonial = await Testimonial.findById(req.params.id);
+  const testimonial = await Testimonial.findById(getValidatedObjectId(req.params.id, "testimonial"));
   if (!testimonial) return res.status(404).json({ message: "Testimonial not found" });
   res.status(200).json({ testimonial });
 });
@@ -407,7 +524,7 @@ export const createTestimonial = asyncHandler(async (req, res) => {
 });
 
 export const updateTestimonial = asyncHandler(async (req, res) => {
-  const testimonial = await Testimonial.findById(req.params.id);
+  const testimonial = await Testimonial.findById(getValidatedObjectId(req.params.id, "testimonial"));
   if (!testimonial) return res.status(404).json({ message: "Testimonial not found" });
   Object.assign(testimonial, req.body);
   if (req.file?.buffer) {
@@ -424,7 +541,7 @@ export const updateTestimonial = asyncHandler(async (req, res) => {
 });
 
 export const deleteTestimonial = asyncHandler(async (req, res) => {
-  const testimonial = await Testimonial.findById(req.params.id);
+  const testimonial = await Testimonial.findById(getValidatedObjectId(req.params.id, "testimonial"));
   if (!testimonial) return res.status(404).json({ message: "Testimonial not found" });
   await safeDestroy(testimonial.image_public_id, "image");
   await testimonial.deleteOne();
@@ -438,7 +555,7 @@ export const listIndexingLogos = asyncHandler(async (req, res) => {
 });
 
 export const getIndexingLogo = asyncHandler(async (req, res) => {
-  const indexingLogo = await IndexingLogo.findById(req.params.id);
+  const indexingLogo = await IndexingLogo.findById(getValidatedObjectId(req.params.id, "indexing logo"));
   if (!indexingLogo) return res.status(404).json({ message: "Indexing logo not found" });
   res.status(200).json({ indexingLogo });
 });
@@ -458,7 +575,7 @@ export const createIndexingLogo = asyncHandler(async (req, res) => {
 });
 
 export const updateIndexingLogo = asyncHandler(async (req, res) => {
-  const indexingLogo = await IndexingLogo.findById(req.params.id);
+  const indexingLogo = await IndexingLogo.findById(getValidatedObjectId(req.params.id, "indexing logo"));
   if (!indexingLogo) return res.status(404).json({ message: "Indexing logo not found" });
 
   Object.assign(indexingLogo, req.body);
@@ -477,7 +594,7 @@ export const updateIndexingLogo = asyncHandler(async (req, res) => {
 });
 
 export const deleteIndexingLogo = asyncHandler(async (req, res) => {
-  const indexingLogo = await IndexingLogo.findById(req.params.id);
+  const indexingLogo = await IndexingLogo.findById(getValidatedObjectId(req.params.id, "indexing logo"));
   if (!indexingLogo) return res.status(404).json({ message: "Indexing logo not found" });
   await safeDestroy(indexingLogo.image_public_id, "image");
   await indexingLogo.deleteOne();

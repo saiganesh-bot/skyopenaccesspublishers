@@ -11,11 +11,27 @@ import { globalLimiter } from "./middlewares/rateLimiter.js";
 import routes from "./routes/index.js";
 
 export const app = express();
+app.set("etag", false);
+
+const configuredOrigins = String(env.clientOrigin || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const isDevLoopbackOrigin = (origin) =>
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin || "");
 
 app.use(helmet());
 app.use(
   cors({
-    origin: env.clientOrigin,
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (configuredOrigins.includes(origin)) return callback(null, true);
+      if (process.env.NODE_ENV !== "production" && isDevLoopbackOrigin(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true
   })
 );
@@ -35,7 +51,15 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("/api", routes);
+const noCache = (req, res, next) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.set("Pragma", "no-cache");
+  res.set("Expires", "0");
+  res.set("Surrogate-Control", "no-store");
+  next();
+};
+
+app.use("/api", noCache, routes);
 
 app.use(notFound);
 app.use(errorHandler);

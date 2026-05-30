@@ -18,6 +18,7 @@ const transporter = isSmtpConfigured
   : null;
 
 let didWarnSmtpMissing = false;
+const senderAddress = env.smtp.from || env.smtp.user;
 
 const ensureTransporter = () => {
   if (!transporter && !didWarnSmtpMissing) {
@@ -53,7 +54,7 @@ export const sendSubmissionStatusEmail = async ({ to, authorName, title, status 
   `;
 
   await smtpTransport.sendMail({
-    from: env.smtp.from,
+    from: senderAddress,
     to,
     subject,
     html
@@ -64,40 +65,50 @@ export const sendAdminVerificationEmail = async ({ to, adminName, code }) => {
   const smtpTransport = ensureTransporter();
   if (!smtpTransport) return false;
 
-  await smtpTransport.sendMail({
-    from: env.smtp.from,
-    to,
-    subject: "Verify your admin Gmail",
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1d1d1d;">
-        <h2>Admin Email Verification</h2>
-        <p>Hello ${adminName},</p>
-        <p>Your verification code is <strong>${code}</strong>.</p>
-        <p>This code expires in 10 minutes.</p>
-      </div>
-    `
-  });
-
-  return true;
+  try {
+    await smtpTransport.sendMail({
+      from: senderAddress,
+      to,
+      subject: "Verify your admin Gmail",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1d1d1d;">
+          <h2>Admin Email Verification</h2>
+          <p>Hello ${adminName},</p>
+          <p>Your verification code is <strong>${code}</strong>.</p>
+          <p>This code expires in 10 minutes.</p>
+        </div>
+      `
+    });
+    return true;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn(`Failed to send admin verification email: ${err.message}`);
+    return false;
+  }
 };
 
 export const sendAdminTwoFactorCodeEmail = async ({ to, adminName, code }) => {
   const smtpTransport = ensureTransporter();
   if (!smtpTransport) return false;
 
-  await smtpTransport.sendMail({
-    from: env.smtp.from,
-    to,
-    subject: "Your admin login verification code",
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1d1d1d;">
-        <h2>Two-Factor Authentication</h2>
-        <p>Hello ${adminName},</p>
-        <p>Your one-time login code is <strong>${code}</strong>.</p>
-        <p>This code expires in 10 minutes.</p>
-      </div>
-    `
-  });
-
-  return true;
+  try {
+    await smtpTransport.sendMail({
+      from: senderAddress,
+      to,
+      subject: "Your admin login verification code",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1d1d1d;">
+          <h2>Two-Factor Authentication</h2>
+          <p>Hello ${adminName},</p>
+          <p>Your one-time login code is <strong>${code}</strong>.</p>
+          <p>This code expires in 10 minutes.</p>
+        </div>
+      `
+    });
+    return true;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn(`Failed to send admin 2FA email: ${err.message}`);
+    return false;
+  }
 };
