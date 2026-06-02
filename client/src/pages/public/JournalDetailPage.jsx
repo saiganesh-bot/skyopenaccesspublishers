@@ -3,7 +3,7 @@ import { useLocation, useParams, Link } from "react-router-dom";
 import { http } from "../../api/http";
 import { toDriveViewerUrl } from "../../utils/driveViewer";
 import { getPptCoverUrl, getYouTubeThumbnail } from "../../utils/thumbnailHelpers";
-import { InfoTable } from "../../../../server/src/models/InfoTable";
+// import { InfoTable } from "../../../../server/src/models/InfoTable";
 
 const cleanText = (html = "") => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
