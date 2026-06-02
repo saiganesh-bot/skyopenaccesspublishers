@@ -7,7 +7,7 @@ const navItems = [
   { to: "/admin/videos", label: "Videos" },
   { to: "/admin/ppts", label: "PPTs" },
   { to: "/admin/indexing", label: "Indexing" },
-  { to: "/admin/info-table", label: "Info Table" }
+  // { to: "/admin/info-table", label: "Info Table" }
 ];
 
 export const AdminLayout = () => {

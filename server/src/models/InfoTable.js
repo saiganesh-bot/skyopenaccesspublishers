@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 
 const infoTableSchema = new mongoose.Schema({
     journal_id: { type: mongoose.Schema.Types.ObjectId, ref: "Journal", required: true },
-    abbrevation: { type: String, required: true },
-    issn: { type: String, required: true },
-    editor_in_chief: { type: String, required: true },
-    publishing_frequency: { type: String, required: true },
-    impact_factor: { type: String, required: true },
-    publication_type: { type: String, required: true },
-    publishing_model: { type: String, required: true },
-    journal_category: { type: String, required: true },
-    email: { type: String, required: true },
+    abbrevation: { type: String},
+    issn: { type: String},
+    editor_in_chief: { type: String},
+    publishing_frequency: { type: String},
+    impact_factor: { type: String},
+    publication_type: { type: String},
+    publishing_model: { type: String},
+    journal_category: { type: String},
+    email: { type: String},
     alternate_email: { type: String }
 
 });

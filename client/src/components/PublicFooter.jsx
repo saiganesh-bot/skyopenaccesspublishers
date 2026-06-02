@@ -111,7 +111,7 @@ export const PublicFooter = () => {
             </div>
             <div className="contact-item">
               <i className="fa-regular fa-envelope"></i>
-              <p>email@example.com</p>
+              <p>skyopenaccess@gmail.com</p>
             </div>
           </div>
 

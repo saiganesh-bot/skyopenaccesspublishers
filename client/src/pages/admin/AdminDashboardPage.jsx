@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { http } from "../../api/http";
+import { ImageCropModal } from "../../components/ImageCropModal";
 
 const initialJournal = {
   title: "",

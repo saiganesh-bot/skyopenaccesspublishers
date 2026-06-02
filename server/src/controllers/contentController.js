@@ -603,24 +603,40 @@ export const deleteIndexingLogo = asyncHandler(async (req, res) => {
 });
 
 export const getInfoTable = asyncHandler(async (req, res) => {
-  const infoTable = await InfoTable.findOne({ journal_id: getValidatedObjectId(req.params.journal_id, "journal") });
-  if (!infoTable) return res.status(404).json({ message: "Info table not found for this journal" });
+  const journalId = req.params.journal_id || req.query.journal_id;
+  // if (!journalId) return res.status(400).json({ message: "journal_id is required" });
+  const infoTable = await InfoTable.findOne({ journal_id: getValidatedObjectId(journalId, "journal") });
+  // if (!infoTable) return res.status(404).json({ message: "Info table not found for this journal" });
   res.status(200).json({ infoTable });
 });
 
 export const updateInfoTable = asyncHandler(async (req, res) => {
-  const journal_id = getValidatedObjectId(req.body.journal_id, "journal");
+  const journal_id = getValidatedObjectId(req.body.journal_id || req.query.journal_id, "journal");
   let infoTable = await InfoTable.findOne({ journal_id });
+  const fields = {
+    abbrevation: req.body.abbrevation || "",
+    issn: req.body.issn || "",
+    editor_in_chief: req.body.editor_in_chief || "",
+    publishing_frequency: req.body.publishing_frequency || "",
+    impact_factor: req.body.impact_factor || "",
+    publication_type: req.body.publication_type || "",
+    publishing_model: req.body.publishing_model || "",
+    journal_category: req.body.journal_category || "",
+    email: req.body.email || "",
+    alternate_email: req.body.alternate_email || ""
+  };
+
   if (!infoTable) {
-    infoTable = await InfoTable.create({ journal_id, content: req.body.content || "" });
+    infoTable = await InfoTable.create({ journal_id, ...fields });
   } else {
-    infoTable.content = req.body.content || infoTable.content;
+    Object.assign(infoTable, fields);
     await infoTable.save();
   }
   res.status(200).json({ infoTable });
 });
+
 export const deleteInfoTable = asyncHandler(async (req, res) => {
-  const journal_id = getValidatedObjectId(req.body.journal_id, "journal");
+  const journal_id = getValidatedObjectId(req.body.journal_id || req.query.journal_id || req.params.journal_id, "journal");
   const infoTable = await InfoTable.findOne({ journal_id });
   if (!infoTable) return res.status(404).json({ message: "Info table not found for this journal" });
   await infoTable.deleteOne();

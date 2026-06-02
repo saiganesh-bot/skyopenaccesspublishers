@@ -730,13 +730,6 @@ export const AdminContentPage = ({
             ) : null}
             <input placeholder="Title" required value={forms.video.title} onChange={(e) => setForm("video", { title: e.target.value })} />
             <input placeholder="YouTube URL" required value={forms.video.youtube_url} onChange={(e) => setForm("video", { youtube_url: e.target.value })} />
-            <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              Upload Cover / Thumbnail (16:9 ratio)
-              <input type="file" accept="image/*" onChange={(e) => handleThumbnailPick(e, "video-thumbnail")} />
-              {forms.video.thumbnail ? (
-                <span className="muted-line" style={{ color: "green", fontSize: "0.85rem" }}>Cropped thumbnail ready to upload.</span>
-              ) : null}
-            </label>
             <button className="primary-btn" type="submit">Create Video</button>
           </form>
           {(isGlobalScope ? allItems.videos.filter((item) => !item.journal_id) : allItems.videos).map((item) => (

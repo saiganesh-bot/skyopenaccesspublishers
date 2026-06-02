@@ -1,20 +1,49 @@
 import { useEffect, useMemo, useState } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { http } from "../../api/http";
+import { InfoTable } from "../../../../server/src/models/InfoTable";
 
 const cleanText = (html = "") => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
 export const JournalsPage = () => {
   const [journals, setJournals] = useState([]);
   const [searchParams] = useSearchParams();
+  const [infoTables, setInfoTables] = useState({});
   const query = (searchParams.get("q") || "").trim().toLowerCase();
 
   useEffect(() => {
-    http
-      .get("/journals")
-      .then((res) => setJournals(res.data.journals || []))
-      .catch(() => setJournals([]));
-  }, []);
+  const loadData = async () => {
+    try {
+      const journalRes = await http.get("/journals");
+      const journalsData = journalRes.data.journals || [];
+
+      setJournals(journalsData);
+
+      const infoTableMap = {};
+
+      await Promise.all(
+        journalsData.map(async (journal) => {
+          try {
+            const res = await http.get(
+              `/content/info-table/${journal._id}`
+            );
+
+            infoTableMap[journal._id] = res.data?.infoTable || null;
+          } catch {
+            infoTableMap[journal._id] = null;
+          }
+        })
+      );
+
+      setInfoTables(infoTableMap);
+    } catch (error) {
+      console.error(error);
+      setJournals([]);
+    }
+  };
+
+  loadData();
+}, []);
 
   const filteredJournals = useMemo(() => {
     if (!query) return journals;
@@ -65,7 +94,7 @@ export const JournalsPage = () => {
 
               <div className="journal-content-primary">
               <div className="journal-content-indicator">
-              <h4>ISSN: 3567-190</h4>
+              <h4>ISSN: {infoTables[journal._id]?.issn || "N/A"}</h4>
               <p>Open Access</p>
               </div>
                 <h3>{journal.title}</h3>

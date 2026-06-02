@@ -104,9 +104,11 @@ router.post("/indexing-logos", protect, adminOnly, imageUpload.single("image"), 
 router.put("/indexing-logos/:id", protect, adminOnly, imageUpload.single("image"), updateIndexingLogo);
 router.delete("/indexing-logos/:id", protect, adminOnly, deleteIndexingLogo);
 
+router.get("/info-table/:journal_id", getInfoTable);
 router.get("/info-table", getInfoTable);
 router.post("/info-table", protect, adminOnly, updateInfoTable);
 router.put("/info-table", protect, adminOnly, updateInfoTable);
+router.delete("/info-table/:journal_id", protect, adminOnly, deleteInfoTable);
 router.delete("/info-table", protect, adminOnly, deleteInfoTable);
 
 export default router;

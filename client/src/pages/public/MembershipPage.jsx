@@ -15,7 +15,7 @@ export const MembershipPage = () => (
         <div className="membership-header">
           <h2>Membership</h2>
           <p>
-            At MK ScienceSet, we deeply value the contributions of our authors and provide
+            At SKY Open Access Publishers, we deeply value the contributions of our authors and provide
             exclusive benefits that support your publishing journey.
           </p>
         </div>

@@ -6,6 +6,7 @@ import { http } from "../../api/http";
 
 const tabs = [
   { key: "details", label: "Details" },
+  { key: "info-table", label: "Info Table" },
   { key: "editorial-board", label: "Editorial Board" },
   { key: "articles-in-press", label: "Articles In Press" },
   { key: "current-issue", label: "Current Issue" },
@@ -34,6 +35,19 @@ export const AdminJournalManagePage = () => {
     author_guidelines: "",
     cover: null
   });
+  const [infoTableForm, setInfoTableForm] = useState({
+    abbrevation: "",
+    issn: "",
+    editor_in_chief: "",
+    publishing_frequency: "",
+    impact_factor: "",
+    publication_type: "",
+    publishing_model: "",
+    journal_category: "",
+    email: "",
+    alternate_email: ""
+  });
+  const [hasInfoTable, setHasInfoTable] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState("");
   const [cropType, setCropType] = useState(""); // "journal-cover", "ppt-thumbnail", or "video-thumbnail"
   const [articleForm, setArticleForm] = useState({
@@ -112,6 +126,40 @@ export const AdminJournalManagePage = () => {
         ppts: pptsRes.data.ppts || [],
         indexingLogos: indexingRes.data.indexingLogos || []
       });
+
+      try {
+        const infoRes = await http.get(`/content/info-table/${journalId}`);
+        if (infoRes.data?.infoTable) {
+          const it = infoRes.data.infoTable;
+          setInfoTableForm({
+            abbrevation: it.abbrevation || "",
+            issn: it.issn || "",
+            editor_in_chief: it.editor_in_chief || "",
+            publishing_frequency: it.publishing_frequency || "",
+            impact_factor: it.impact_factor || "",
+            publication_type: it.publication_type || "",
+            publishing_model: it.publishing_model || "",
+            journal_category: it.journal_category || "",
+            email: it.email || "",
+            alternate_email: it.alternate_email || ""
+          });
+          setHasInfoTable(true);
+        }
+      } catch {
+        setInfoTableForm({
+          abbrevation: "",
+          issn: "",
+          editor_in_chief: "",
+          publishing_frequency: "",
+          impact_factor: "",
+          publication_type: "",
+          publishing_model: "",
+          journal_category: "",
+          email: "",
+          alternate_email: ""
+        });
+        setHasInfoTable(false);
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load journal data");
       if (err.response?.status === 401 || err.response?.status === 403) {
@@ -154,6 +202,53 @@ export const AdminJournalManagePage = () => {
       setForm("video", { thumbnail: file });
     }
     handleCropClose();
+  };
+
+  const handleSubmitInfoTable = async (e) => {
+    e.preventDefault();
+    setError("");
+    setInfo("");
+    try {
+      const payload = {
+        journal_id: journalId,
+        ...infoTableForm
+      };
+      await http.post("/content/info-table", payload);
+      setHasInfoTable(true);
+      setInfo("Info Table updated successfully.");
+      window.alert("Info Table updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save Info Table");
+      window.alert(err.response?.data?.message || "Failed to save Info Table");
+    }
+  };
+
+  const handleDeleteInfoTable = async () => {
+    const confirmed = window.confirm("Are you sure you want to delete this Info Table? This action cannot be undone.");
+    if (!confirmed) return;
+    try {
+      setError("");
+      setInfo("");
+      await http.delete(`/content/info-table/${journalId}`);
+      setInfoTableForm({
+        abbrevation: "",
+        issn: "",
+        editor_in_chief: "",
+        publishing_frequency: "",
+        impact_factor: "",
+        publication_type: "",
+        publishing_model: "",
+        journal_category: "",
+        email: "",
+        alternate_email: ""
+      });
+      setHasInfoTable(false);
+      setInfo("Info Table deleted successfully.");
+      window.alert("Info Table deleted successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete Info Table");
+      window.alert(err.response?.data?.message || "Failed to delete Info Table");
+    }
   };
 
   const updateJournal = async (e) => {
@@ -533,6 +628,118 @@ export const AdminJournalManagePage = () => {
             </label>
             <button className="primary-btn" type="submit">
               Update Journal
+            </button>
+          </form>
+        </section>
+      ) : null}
+
+      {activeTab === "info-table" ? (
+        <section className="form-card admin-panel">
+          <div className="panel-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h3>Journal Info Table</h3>
+              <p className="muted-line">Manage the journal's metadata shown on the public sidebar.</p>
+            </div>
+            {hasInfoTable && (
+              <button className="danger-btn" type="button" onClick={handleDeleteInfoTable}>
+                Delete Info Table
+              </button>
+            )}
+          </div>
+          <form onSubmit={handleSubmitInfoTable} className="form-grid" style={{ marginTop: "1rem" }}>
+            <label>
+              Abbreviation *
+              <input
+                required
+                placeholder="e.g. JCNR"
+                value={infoTableForm.abbrevation}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, abbrevation: e.target.value }))}
+              />
+            </label>
+            <label>
+              ISSN *
+              <input
+                required
+                placeholder="e.g. 3065-3630"
+                value={infoTableForm.issn}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, issn: e.target.value }))}
+              />
+            </label>
+            <label>
+              Editor-in-Chief *
+              <input
+                required
+                placeholder="e.g. Cesare Formisano"
+                value={infoTableForm.editor_in_chief}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, editor_in_chief: e.target.value }))}
+              />
+            </label>
+            <label>
+              Publishing Frequency *
+              <input
+                required
+                placeholder="e.g. Bi-Monthly"
+                value={infoTableForm.publishing_frequency}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, publishing_frequency: e.target.value }))}
+              />
+            </label>
+            <label>
+              Impact Factor *
+              <input
+                required
+                placeholder="e.g. 1.25"
+                value={infoTableForm.impact_factor}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, impact_factor: e.target.value }))}
+              />
+            </label>
+            <label>
+              Publication Type *
+              <input
+                required
+                placeholder="e.g. Peer Reviewed"
+                value={infoTableForm.publication_type}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, publication_type: e.target.value }))}
+              />
+            </label>
+            <label>
+              Publishing Model *
+              <input
+                required
+                placeholder="e.g. Open Access"
+                value={infoTableForm.publishing_model}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, publishing_model: e.target.value }))}
+              />
+            </label>
+            <label>
+              Journal Category *
+              <input
+                required
+                placeholder="e.g. Journal of Clinical Nursing & Reports"
+                value={infoTableForm.journal_category}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, journal_category: e.target.value }))}
+              />
+            </label>
+            <label>
+              Email *
+              <input
+                required
+                type="email"
+                placeholder="e.g. contact.nursing@onlinemarks.info"
+                value={infoTableForm.email}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, email: e.target.value }))}
+              />
+            </label>
+            <label>
+              Alternate Email
+              <input
+                type="email"
+                placeholder="e.g. Nursingreports@onlinescience.net"
+                value={infoTableForm.alternate_email}
+                onChange={(e) => setInfoTableForm((prev) => ({ ...prev, alternate_email: e.target.value }))}
+              />
+            </label>
+            <button className="primary-btn" type="submit">
+              {hasInfoTable ? "Update Info Table" : "Create Info Table"}
             </button>
           </form>
         </section>

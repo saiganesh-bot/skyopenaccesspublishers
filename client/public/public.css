@@ -260,6 +260,7 @@ main {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: none;
 }
 
 /* ================================================== Navbar ===== */
@@ -1468,7 +1469,7 @@ main.mobile-main {
 .oa-section {
   max-width: 1300px;
   margin: auto;
-  padding: 2% 0;
+  padding: 5% 0;
 }
 
 /* ================= ROW LAYOUT ================= */
@@ -1790,7 +1791,7 @@ li {
 
 /* ============================================= Author-Guidelines ========================= */
 .author-guidelines-section {
-  padding: 100px 8%;
+  padding: 5% 10%;
   font-family: var(--font-secondary);
   margin-top: 120px;
   margin-top: 120px;
@@ -3330,6 +3331,8 @@ img {
 
 .tab-content.active {
   display: block;
+  margin-top: 5%;
+  margin-right: 2%;
 }
 
 .content p {
