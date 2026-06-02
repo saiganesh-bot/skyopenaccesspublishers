@@ -49,8 +49,8 @@ export const JournalsPage = () => {
   return (
     <main>
       <section className="journals fade-up">
-        <div className="container">
           <h2 className="section-title">Journals</h2>
+        <div className="journal-container">
           {query ? <p className="search-meta">Results for "{query}"</p> : null}
 
           {filteredJournals.map((journal) => (
@@ -64,11 +64,11 @@ export const JournalsPage = () => {
               </div>
 
               <div className="journal-content-primary">
+              <div className="journal-content-indicator">
+              <h4>ISSN: 3567-190</h4>
+              <p>Open Access</p>
+              </div>
                 <h3>{journal.title}</h3>
-                <p>{truncateToWords(journal.about || "No description provided yet.", 60)}</p>
-                <a href={`/journals/${journal.slug}`} className="rm-link">
-                  Read More...
-                </a>
 
                 <div className="journal-buttons">
                   <NavLink to={`/journals/${journal.slug}`} className="btn">

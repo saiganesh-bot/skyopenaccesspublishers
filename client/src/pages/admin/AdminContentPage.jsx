@@ -10,7 +10,8 @@ const tabs = [
   "videos",
   "ppts",
   "testimonials",
-  "indexing-logos"
+  "indexing-logos",
+  "info-table"
 ];
 
 const jsonList = (text) =>

@@ -13,6 +13,7 @@ import { Testimonial } from "../models/Testimonial.js";
 import { Video } from "../models/Video.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadBufferToCloudinary } from "../utils/uploadToCloudinary.js";
+import { InfoTable } from "../models/InfoTable.js";
 
 const parseIds = (value) => {
   if (Array.isArray(value)) return value;
@@ -599,4 +600,29 @@ export const deleteIndexingLogo = asyncHandler(async (req, res) => {
   await safeDestroy(indexingLogo.image_public_id, "image");
   await indexingLogo.deleteOne();
   res.status(200).json({ message: "Indexing logo deleted" });
+});
+
+export const getInfoTable = asyncHandler(async (req, res) => {
+  const infoTable = await InfoTable.findOne({ journal_id: getValidatedObjectId(req.params.journal_id, "journal") });
+  if (!infoTable) return res.status(404).json({ message: "Info table not found for this journal" });
+  res.status(200).json({ infoTable });
+});
+
+export const updateInfoTable = asyncHandler(async (req, res) => {
+  const journal_id = getValidatedObjectId(req.body.journal_id, "journal");
+  let infoTable = await InfoTable.findOne({ journal_id });
+  if (!infoTable) {
+    infoTable = await InfoTable.create({ journal_id, content: req.body.content || "" });
+  } else {
+    infoTable.content = req.body.content || infoTable.content;
+    await infoTable.save();
+  }
+  res.status(200).json({ infoTable });
+});
+export const deleteInfoTable = asyncHandler(async (req, res) => {
+  const journal_id = getValidatedObjectId(req.body.journal_id, "journal");
+  const infoTable = await InfoTable.findOne({ journal_id });
+  if (!infoTable) return res.status(404).json({ message: "Info table not found for this journal" });
+  await infoTable.deleteOne();
+  res.status(200).json({ message: "Info table deleted for this journal" });
 });

@@ -11,13 +11,14 @@ export const PeerReviewPage = () => (
         for accuracy, originality, and relevance before it becomes part of the scientific
         record.
       </p>
-      <div className="peer-container">
-        <div className="peer-text from-left">
+      <img src="/images/peer-review.png" alt="Peer Review" />
+      <div className="peer-container fade-up show">
+        <div className="peer-text fade-up show">
 
 
-          <h2 className="fade-up">What is Peer Review?</h2>
+          <h2 className="fade-up show">What is Peer Review?</h2>
 
-          <p className="fade-up">
+          <p className="fade-up show">
             Peer review is a structured evaluation process in which independent experts in a
             relevant field assess a submitted manuscript prior to publication. The purpose of this
             process is to ensure that the research is scientifically sound, methodologically
@@ -28,8 +29,9 @@ export const PeerReviewPage = () => (
             At SKY Open Access Publishers, we implement well-defined and transparent peer-review
             models, including:
           </p>
+          
 
-          <ul className="fade-up">
+          <ul className="fade-up show">
             <li>
               <strong>Single-blind review:</strong> Reviewers know the identity of the authors, but
               authors do not know who the reviewers are. This helps maintain objectivity.
@@ -39,9 +41,10 @@ export const PeerReviewPage = () => (
               anonymous, reducing bias and focusing solely on the quality of the research.
             </li>
           </ul>
-          <h2 className="fade-up pr-h2">Why Peer Review Matters</h2>
+          
+          <h2 className="fade-up show pr-h2">Why Peer Review Matters</h2>
 
-          <p className="fade-up">
+          <p className="fade-up show">
             Peer review is a vital mechanism of quality control in academia. It helps identify
             errors, improve clarity, and verify that research is reliable and well-supported. This
             process enhances the credibility of academic publishing and builds trust among scholars,
@@ -50,18 +53,14 @@ export const PeerReviewPage = () => (
             only high-quality work is published.
           </p>
         </div>
-
-        <div className="peer-image from-right">
-          <img src="/images/peer-review.svg" alt="Peer Review" />
-        </div>
       </div>
 
-      <div className="peer-full-text">
+      <div className="peer-full-text fade-up show">
 
 
-        <h2 className="fade-up">Our Peer Review Workflow</h2>
+        <h2 className="fade-up show">Our Peer Review Workflow</h2>
 
-        <ul className="fade-up">
+        <ul className="fade-up show">
           <li>
             <strong>Submission:</strong> Authors submit their manuscripts via our online system.
           </li>
@@ -91,9 +90,9 @@ export const PeerReviewPage = () => (
           </li>
         </ul>
 
-        <h2 className="fade-up">Benefits of Our Peer Review Process</h2>
+        <h2 className="fade-up show">Benefits of Our Peer Review Process</h2>
 
-        <ul className="fade-up">
+        <ul className="fade-up show">
           <li>
             <strong>Rigorous Evaluation:</strong> We maintain academic excellence by publishing only
             carefully vetted research.
@@ -112,25 +111,27 @@ export const PeerReviewPage = () => (
           </li>
         </ul>
 
-        <h2 className="fade-up">Become a Peer Reviewer</h2>
+        <h2 className="fade-up show">Become a Peer Reviewer</h2>
 
-        <p className="fade-up">
+        <p className="fade-up show">
           Are you an experienced academic or researcher? Join our peer review team to help shape
           the future of scientific publishing. As a reviewer, you will:
         </p>
 
-        <ul className="fade-up">
+        <ul className="fade-up show">
           <li>Contribute to upholding high research standards</li>
           <li>Gain access to cutting-edge research in your field</li>
           <li>Strengthen your academic credentials</li>
           <li>Support global knowledge-sharing and collaboration</li>
         </ul>
 
-        <p className="fade-up">
+        <p className="fade-up show">
           Apply today to become a valued reviewer with Open-Ethics Publishers and help ensure that
           published research meets the highest academic standards.
         </p>
       </div>
     </section>
+    
+
   </main>
 );

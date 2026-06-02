@@ -635,6 +635,7 @@ main {
   color: #ff6a00;
   font-weight: 600;
   font-size: 38px;
+  font-family: var(--font-secondary);
 }
 
 .home-about-content h2 {
@@ -1422,7 +1423,7 @@ main.mobile-main {
 }
 
 .about-text p {
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.8;
   color: #000000;
   /* SAME as Open Access */
@@ -1574,9 +1575,16 @@ main.mobile-main {
 
 /* ================= LOGO SLIDER ================= */
 .logo-section {
-  background: #111;
+  /* background: #111; */
   padding: 40px 0;
   overflow: hidden;
+  text-align: center;
+}
+
+.logo-section h2 {
+  margin-bottom: 30px;
+  font-family: var(--font-secondary);
+  /* color: #fff; */
 }
 
 .logo-slider {
@@ -1759,10 +1767,16 @@ footer {
   font-family: var(--font-secondary);
 }
 
-.peer-full-text ul,
 li {
   margin-left: 20px;
   /* margin-bottom: 15px; */
+  font-family: var(--font-secondary);
+  line-height: 1.8;
+}
+
+.peer-full-text ul li {
+  margin-left: 20px;
+  margin-bottom: 15px;
   font-family: var(--font-secondary);
   line-height: 1.8;
 }
@@ -1775,26 +1789,29 @@ li {
 }
 
 /* ============================================= Author-Guidelines ========================= */
-
 .author-guidelines-section {
-  padding: 2% 8%;
+  padding: 100px 8%;
   font-family: var(--font-secondary);
+  margin-top: 120px;
+  margin-top: 120px;
 }
 
 .author-container {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
-  max-width: 2100px;
-  margin-bottom: 10%;
+  gap: 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.author-text {
+  position: relative;
 }
 
 /* LEFT SIDE */
 .author-text {
   flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 .author-text h1 {
@@ -1822,17 +1839,20 @@ li {
   font-family: var(--font-secondary);
 }
 
-/* RIGHT SIDE IMAGE */
 .author-image {
-  flex: 1;
-  text-align: right;
+  float: right;
+  width: 480px;
+  margin-left: 50px;
+  margin-bottom: 30px;
 }
 
 .author-image img {
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   display: block;
-  margin-left: 100px;
+  border-radius: 6px;
+  margin-top: -40px;
+
 }
 
 @media (max-width: 900px) {
@@ -1860,9 +1880,23 @@ li {
 /* ========================= */
 
 .from-left,
-.from-right,
-.fade-up {
-  transition: all 1s ease;
+.from-right {
+  opacity: 0;
+  transition: transform 1.4s ease, opacity 1.4s ease;
+}
+
+.from-left {
+  transform: translateX(-80px);
+}
+
+.from-right {
+  transform: translateX(80px);
+}
+
+/* ================= ACTIVE STATE ================= */
+.show {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .pr-h2 {
@@ -1871,11 +1905,6 @@ li {
 
 .fade-up {
   transform: translateY(40px);
-}
-
-.show {
-  opacity: 1;
-  transform: translate(0, 0);
 }
 
 /* ========================= */
@@ -1996,7 +2025,6 @@ li {
 
   padding: 30px;
 
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
 .testimonial-arrow {
@@ -2097,8 +2125,6 @@ li {
   border-radius: 20px;
   width: min(600px, 80vw);
   min-width: min(520px, 80vw);
-
-  background: #fafafa;
   /* slight contrast inside */
   scroll-snap-align: start;
 }
@@ -2203,11 +2229,12 @@ li {
   /* THIS centers the container */
 }
 
-.journals .container {
+.journal-container {
   display: flex;
   text-align: center;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  /* align-items: center; */
+  flex-wrap: wrap;
 }
 
 /* ===== Title ===== */
@@ -2221,32 +2248,45 @@ li {
 /* ===== Journal Item ===== */
 .journal-item {
   display: flex;
-  flex-direction: row;
-  /* ✅ horizontal layout */
   align-items: center;
-  justify-content: flex-start;
-  /* ✅ align to left */
+  /* justify-content: flex-start; */
   gap: 30px;
   margin-bottom: 2rem;
   text-align: left;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
   padding: 10px;
-  /* ✅ text aligned left */
+  width: 37vw;
+}
+
+.journal-content-indicator {
+  width: 23vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.journal-content-indicator p {
+  padding: 6px 14px;
+  background: #ffffff;
+  border-radius: 19px;
+  border: 1px solid #2ac60f;
+  color: #2ac60f;
+  font-size: 13px;
 }
 
 /* ===== Image ===== */
 .journal-image {
-  flex: 0 0 220px;
-
-  /* ✅ fixed width */
+  flex: 0 0 18vh;
   place-items: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  margin-left: 30px;
+  margin-left: 10px;
+  width: 25%;
+  aspect-ratio: 2 / 3;
 }
 
 .journal-image img {
-  width: 80%;
-  aspect-ratio: 2 / 3;
+  /* width: 60%; */
+  /* aspect-ratio: 2 / 3; */
   height: auto;
   object-fit: cover;
 }
@@ -2438,6 +2478,7 @@ li {
 
 .pricing-table {
   margin-bottom: 90px;
+  width: 80%;
 }
 
 .pricing-table table {
@@ -3406,6 +3447,7 @@ img {
   position: absolute;
   right: 72px;
   top: 50%;
+  height: 30px;
   transform: translateY(-50%);
   background: #333;
   color: #fff;
@@ -3484,7 +3526,7 @@ section.about-section-main {
   }
 
   .journal-content-primary h3 {
-    font-size: 1rem;
+    font-size: 0.65rem;
   }
 
   .journal-content-primary {

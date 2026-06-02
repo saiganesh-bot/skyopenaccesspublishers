@@ -13,6 +13,20 @@ export const PptsPage = () => {
       .catch(() => setPpts([]));
   }, []);
 
+  if (!ppts.length) {
+    return (
+      <main className="ppt-section fade-up">
+        <div className="ppt-container">
+          <div className="ppt-image">
+            <img src="/images/ppt.png" alt="No PPTs Available" />
+          </div>
+          <h2>No PPTs Have Been Added Yet</h2>
+          <p>We are currently preparing presentation content. Please check back again soon.</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="ppt-container">
       <section className="card-section">
@@ -23,7 +37,7 @@ export const PptsPage = () => {
               href={toDriveViewerUrl(ppt.file_url)}
               target="_blank"
               rel="noreferrer"
-              className="ppt-card"
+              className="ppt-card fade-up"
               key={ppt._id}
             >
               <div className="ppt-cover">
@@ -52,7 +66,6 @@ export const PptsPage = () => {
               <span className="inline-link">Open</span>
             </a>
           ))}
-          {!ppts.length ? <p className="no-content">No PPTs available yet.</p> : null}
         </div>
       </section>
     </main>

@@ -386,16 +386,7 @@ const previewText = (value) => {
         Sciences.
       </p>
     </div>
-    {testimonials.length > 1 && (
-        <button
-          className="testimonial-arrow left"
-          onClick={() =>
-            scrollTestimonials(-1)
-          }
-        >
-          ←
-        </button>
-      )}
+
 
     <div className="testimonial-shell">
       
@@ -405,7 +396,8 @@ const previewText = (value) => {
         ref={testimonialsRef}
       >
         {testimonials.length ? (
-          testimonials.map((item) => (
+          <>
+            {testimonials.map((item) => (
             <article
               className="testimonial-card fade-up"
               key={item._id}
@@ -445,7 +437,50 @@ const previewText = (value) => {
                 </div>
               </div>
             </article>
-          ))
+          ))}
+            {testimonials.map((item) => (
+              <article
+                className="testimonial-card fade-up"
+                key={`${item._id}-duplicate`}
+                aria-hidden="true"
+              >
+                <div className="quote-icon">
+                  "
+                </div>
+
+                <p className="testimonial-text">
+                  {previewText(
+                    item.description
+                  )}
+                </p>
+
+                <div className="divider" />
+
+                <div className="client-info">
+                  <img
+                    src={
+                      item.image_url ||
+                      "https://randomuser.me/api/portraits/men/32.jpg"
+                    }
+                    alt={
+                      item.name || "Client"
+                    }
+                  />
+
+                  <div>
+                    <h4>
+                      {item.name ||
+                        "Client"}
+                    </h4>
+
+                    <span>
+                      Contributor
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </>
         ) : (
           <article className="testimonial-card">
             <div className="quote-icon">
@@ -462,16 +497,6 @@ const previewText = (value) => {
 
       
     </div>
-    {testimonials.length > 1 && (
-        <button
-          className="testimonial-arrow right"
-          onClick={() =>
-            scrollTestimonials(1)
-          }
-        >
-          →
-        </button>
-      )}
 </section>
     </main>
   );

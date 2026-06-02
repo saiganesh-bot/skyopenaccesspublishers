@@ -22,9 +22,14 @@ export const PublicFooter = () => {
       )}`
     : null;
 
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <>
       <section className="logo-section">
+       <h2>Associated Indexing Partners</h2>
         <div className="logo-slider">
           <div className="logo-track">
             {logos.map((logo) => (
@@ -37,93 +42,122 @@ export const PublicFooter = () => {
         </div>
       </section>
 
-      <footer>
-        <div className="footer-container">
-          <div className="footer-box">
-            <h3>SKY Open Access Publisher</h3>
-            <p>
-              Independent International Publishers of Peer-Reviewed Open-Access Journals in
-              Clinical, Medical, Pharmaceutical, Biomedical, Life Sciences, Engineering, and
-              Environmental Sciences.
-            </p>
-          </div>
+      <footer className="publisher-footer">
+        <div className="footer-main">
+          
+          {/* ABOUT SECTION */}
+          <div className="footer-about">
+            <div className="footer-logo">
+              <div className="logo-icon">
+                <NavLink to="/"><img src="/images/sky-logo-final-white.png" alt="SKY Open Access Publisher" className="footer-logo-img" /></NavLink>
+              </div>
+              <div>
+              
+                <h2>SKY</h2>
+                <span>OPEN ACCESS Publisher</span>
+              </div>
+            </div>
 
-          <div className="footer-box main-links">
-            <h3>Main Links</h3>
-            <ul>
-              <li>
-                <NavLink to="/">Home</NavLink>
-              </li>
-              <li>
-                <NavLink to="/about">About</NavLink>
-              </li>
-              <li>
-                <NavLink to="/open-access">Open Access</NavLink>
-              </li>
-              <li>
-                <NavLink to="/journals">Journals</NavLink>
-              </li>
-              <li>
-                <NavLink to="/peer-review">Peer Review</NavLink>
-              </li>
-              <li>
-                <NavLink to="/author-guidelines">Author Guidelines</NavLink>
-              </li>
-              <li>
-                <NavLink to="/videos">Videos</NavLink>
-              </li>
-              <li>
-                <NavLink to="/ppts">PPT</NavLink>
-              </li>
-              <li>
-                <NavLink to="/membership">Membership</NavLink>
-              </li>
-            </ul>
-          </div>
-
-          <div className="footer-box">
-            <h3>Address</h3>
             <p>
-              SKY Open Access Publisher <br />
-              H.NO: 9-223 /H/ 4 <br />
-              MAISAMMA GUTTA, GHATKESAR <br />
-              MEDCHAL DISTRICT 501301 <br />
-              +91 9963077304 <br />
-              email@example.com
+              Independent International Publishers of Peer-Reviewed Open-Access Journals in Medical, Pharmaceutical, Engineering, Biomedical, and Environmental Sciences.
             </p>
 
-            <div className="social-icons">
-              <i className="fab fa-facebook-f" />
-              <i className="fab fa-x-twitter" />
-              <i className="fab fa-instagram" />
+            <div className="footer-socials">
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-x-twitter"></i>
+              </a>
+              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-instagram"></i>
+              </a>
+              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-linkedin-in"></i>
+              </a>
             </div>
           </div>
 
-          <div className="footer-box">
-            <h3>Reach Us</h3>
-            {mapSrc ? (
-              <iframe
-                title="SKY Open Access location"
-                src={mapSrc}
-                className="map-img"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-              />
-            ) : (
-              <>
-                <img src="/images/map.png" className="map-img" alt="Map" />
-                {typeof console !== 'undefined' &&
-                  console.warn(
-                    'VITE_GOOGLE_MAPS_API_KEY not set — using static map image fallback'
-                  )}
-              </>
-            )}
+          {/* MAIN LINKS */}
+          <div className="footer-column">
+            <h3>Main Links</h3>
+            <ul>
+              <li><NavLink to="/">Home <span>›</span></NavLink></li>
+              <li><NavLink to="/about">About <span>›</span></NavLink></li>
+              <li><NavLink to="/open-access">Open Access <span>›</span></NavLink></li>
+              <li><NavLink to="/journals">Journals <span>›</span></NavLink></li>
+              <li><NavLink to="/peer-review">Peer Review <span>›</span></NavLink></li>
+              <li><NavLink to="/author-guidelines">Author Guidelines <span>›</span></NavLink></li>
+              <li><NavLink to="/membership">Membership <span>›</span></NavLink></li>
+              <li><NavLink to="/videos">Videos <span>›</span></NavLink></li>
+              <li><NavLink to="/ppts">PPT <span>›</span></NavLink></li>
+            </ul>
+          </div>
+
+          {/* ADDRESS & CONTACT */}
+          <div className="footer-column">
+            <h3>Address</h3>
+            <div className="contact-item">
+              <i className="fa-solid fa-location-dot"></i>
+              <p>
+                H.NO: 9-223/H/4,<br />
+                Maisamma Gutta, Ghatkesar,<br />
+                Medchal District 501301
+              </p>
+            </div>
+            <div className="contact-item">
+              <i className="fa-solid fa-phone"></i>
+              <p>+91 9963077304</p>
+            </div>
+            <div className="contact-item">
+              <i className="fa-regular fa-envelope"></i>
+              <p>email@example.com</p>
+            </div>
+          </div>
+
+          {/* MAP SECTION */}
+          <div className="footer-column">
+            <div className="footer-map">
+              <h3>Reach Us</h3>
+              {/* {mapSrc ? (
+                <iframe
+                  title="SKY Open Access location"
+                  src={mapSrc}
+                  style={{ 
+                    border: 0,
+                    width: '250px',
+                    height: '250px',
+                    borderRadius: '12px'
+                  }}
+                  allowFullScreen=""
+                  loading="lazy"
+                />
+              ) : (
+              )} */}
+                <img src="/images/map.png" alt="Location Map" />
+            </div>
           </div>
         </div>
-      </footer>
 
-      <div className="copyright">© 2025 Open Ethics Publisher. All Rights Reserved.</div>
+        {/* FOOTER BOTTOM */}
+        <div className="footer-bottom">
+          <p>© 2025 SKY Open Access Publisher. All Rights Reserved.</p>
+          
+          <div className="bottom-links">
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms</a>
+            <a href="#cookies">Cookies</a>
+          </div>
+
+          <button 
+            className="top-btn"
+            onClick={handleScrollToTop}
+            aria-label="Back to top"
+          >
+            ↑
+          </button>
+        </div>
+      </footer>
 
       <div className="whatsapp-float" id="whatsapp-float">
         <span className="whatsapp-tooltip">Chat with us on WhatsApp</span>

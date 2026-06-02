@@ -5,11 +5,20 @@ export const OpenAccessPage = () => (
         <div className="oa-text from-right">
           <h1>OPEN ACCESS</h1>
           <p>
-            At SKY Open Access Publishers, we believe that knowledge should be accessible to
-            everyone without limitation. Our open-access publishing model ensures that all
-            research we publish is freely available online, without subscription fees or paywalls.
-            This commitment supports our mission to promote global knowledge exchange and
-            encourage collaboration across disciplines.
+            At SKY Open Access Publishers,
+            we believe that knowledge should be accessible to
+            everyone without limitation. Our open-access publishing
+            model ensures that all research we publish is freely available
+            online, without subscription fees or paywalls. This commitment
+            supports our mission to promote global knowledge exchange and encourage
+            collaboration across disciplines. By providing unrestricted access to scholarly
+            content, we help researchers, students, educators, and professionals stay
+            connected with the latest developments in their fields. Our platform enables greater visibility,
+            wider readership, and increased impact for authors and their research contributions.
+            We are dedicated to creating an inclusive academic environment
+            where ideas can be shared openly and innovation can flourish. Through
+            open access, SKY Open Access Publishers continues to support transparency,
+            accessibility, and the advancement of scientific and academic research worldwide.
           </p>
         </div>
 
@@ -22,12 +31,7 @@ export const OpenAccessPage = () => (
         <div className="oa-text from-left">
           <h2>What Is Open Access?</h2>
           <p>
-            Open access is a publishing approach that allows scholarly research to be freely
-            available online to anyone, anywhere. Readers can access, download, share, and use
-            research articles without financial or institutional barriers. At SKY Open Access
-            Publishers, we fully embrace this model because it expands the reach of scientific
-            discoveries and ensures that research benefits the widest possible audience — from
-            academic institutions to independent researchers and industry professionals worldwide.
+            Open access is a publishing approach that allows scholarly research to be freely available online to anyone, anywhere. Readers can access, download, share, and use research articles without financial or institutional barriers. At SKY Open Access Publishers, we fully embrace this model because it expands the reach of scientific discoveries and ensures that research benefits the widest possible audience — from academic institutions to independent researchers and industry professionals worldwide. This approach encourages faster knowledge sharing, greater academic collaboration, and increased research visibility across the global scholarly community. By removing access restrictions, open access helps accelerate innovation and supports the advancement of education, science, technology, and healthcare. At SKY Open Access Publishers, we are committed to maintaining high publishing standards while ensuring that valuable research remains openly accessible for learning, discovery, and future development.
           </p>
         </div>
 
@@ -75,7 +79,12 @@ export const OpenAccessPage = () => (
             Our team is committed to fast, fair, and transparent peer review, ensuring that each
             article is rigorously assessed before being published. We also ensure that all
             published content is preserved and made accessible through widely used open-access
-            repositories, so it remains discoverable and available for years to come.
+            repositories, so it remains discoverable and available for years to come.We also
+            ensure that all published content is preserved and made accessible through widely
+            used open-access repositories, so it remains discoverable and available for years
+            to come. By reaching readers, researchers, and institutions across different countries
+            and disciplines, SKY Open Access Publishers helps authors expand the visibility and impact
+            of their research on a global scale.
           </p>
         </div>
 

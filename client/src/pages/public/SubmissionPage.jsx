@@ -45,7 +45,6 @@ const countries = [
   "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
   "Yemen", "Zambia", "Zimbabwe"
 ];
-
 export const SubmissionPage = () => {
   const [journals, setJournals] = useState([]);
   const [form, setForm] = useState({
@@ -284,6 +283,7 @@ export const SubmissionPage = () => {
                   Upload Manuscript
                 </label>
                 <input id="manuscript" type="file" onChange={onFileChange} hidden accept=".doc,.docx,.pdf" />
+                <p className="file-name">{fileName || "No file chosen"}</p>
               </div>
 
               <button type="submit" className="submit-btn">

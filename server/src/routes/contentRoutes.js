@@ -42,7 +42,10 @@ import {
   updateIndexingLogo,
   updatePpt,
   updateTestimonial,
-  updateVideo
+  updateVideo,
+  getInfoTable,
+  updateInfoTable,
+  deleteInfoTable
 } from "../controllers/contentController.js";
 import { adminOnly, protect } from "../middlewares/auth.js";
 import { documentUpload, imageUpload, pptUpload } from "../middlewares/upload.js";
@@ -100,5 +103,10 @@ router.get("/indexing-logos/:id", getIndexingLogo);
 router.post("/indexing-logos", protect, adminOnly, imageUpload.single("image"), createIndexingLogo);
 router.put("/indexing-logos/:id", protect, adminOnly, imageUpload.single("image"), updateIndexingLogo);
 router.delete("/indexing-logos/:id", protect, adminOnly, deleteIndexingLogo);
+
+router.get("/info-table", getInfoTable);
+router.post("/info-table", protect, adminOnly, updateInfoTable);
+router.put("/info-table", protect, adminOnly, updateInfoTable);
+router.delete("/info-table", protect, adminOnly, deleteInfoTable);
 
 export default router;

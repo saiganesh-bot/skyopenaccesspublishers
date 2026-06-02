@@ -12,6 +12,20 @@ export const VideosPage = () => {
       .catch(() => setVideos([]));
   }, []);
 
+  if (!videos.length) {
+    return (
+      <main className="videos-section fade-up">
+        <div className="videos-container">
+          <div className="videos-image">
+            <img src="/images/videos1.png" alt="No Videos Available" />
+          </div>
+          <h2>No Videos Have Been Added Yet</h2>
+          <p>We are currently preparing video content. Please check back again soon.</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="video-container">
       <section className="card-section">
@@ -22,7 +36,7 @@ export const VideosPage = () => {
               href={video.youtube_url}
               target="_blank"
               rel="noreferrer"
-              className="video-card"
+              className="video-card fade-up"
               key={video._id}
             >
               <div className="video-thumbnail">
@@ -50,7 +64,6 @@ export const VideosPage = () => {
               <span className="inline-link">Watch</span>
             </a>
           ))}
-          {!videos.length ? <p className="no-content">No videos available yet.</p> : null}
         </div>
       </section>
     </main>

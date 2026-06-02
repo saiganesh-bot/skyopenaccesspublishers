@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ImageCropModal } from "../../components/ImageCropModal";
 import { RichTextEditor } from "../../components/RichTextEditor";
@@ -36,6 +36,16 @@ export const AdminJournalManagePage = () => {
   });
   const [cropImageSrc, setCropImageSrc] = useState("");
   const [cropType, setCropType] = useState(""); // "journal-cover", "ppt-thumbnail", or "video-thumbnail"
+  const [articleForm, setArticleForm] = useState({
+    type: "Research",
+    title: "",
+    authors: "",
+    abstract: "",
+    external_link: "",
+    doi_link: "",
+    file: null
+  });
+  const articleFileRef = useRef(null);
 
   const [forms, setForms] = useState({
     article: {
@@ -184,6 +194,16 @@ export const AdminJournalManagePage = () => {
     try {
       await http.post("/content/articles", data);
       await load();
+      setForm("article", {
+        type: "Research",
+        title: "",
+        authors: "",
+        abstract: "",
+        external_link: "",
+        doi_link: "",
+        file: null
+      });
+      articleFileRef.current.value = "";
       setInfo("Article created successfully.");
       window.alert("Article created successfully.");
     } catch (err) {
@@ -581,7 +601,14 @@ export const AdminJournalManagePage = () => {
             </label>
             <label>
               Upload PDF
-              <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setForm("article", { file: e.target.files?.[0] || null })} />
+              <input
+                ref={articleFileRef}
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) =>
+                  setForm("article", { file: e.target.files?.[0] || null })
+                }
+              />
             </label>
             <button className="primary-btn" type="submit">Create Article</button>
           </form>
@@ -640,9 +667,9 @@ export const AdminJournalManagePage = () => {
             </label>
             <label>
               Select Archive Volumes (Hold Ctrl/Cmd to select multiple)
-              <select 
-                multiple 
-                value={forms.currentIssue.archive_volume_ids} 
+              <select
+                multiple
+                value={forms.currentIssue.archive_volume_ids}
                 onChange={(e) => {
                   const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                   setForm("currentIssue", { archive_volume_ids: selected });
@@ -687,9 +714,9 @@ export const AdminJournalManagePage = () => {
             </label>
             <label>
               Select Articles (Hold Ctrl/Cmd to select multiple)
-              <select 
-                multiple 
-                value={forms.archiveVolume.article_ids} 
+              <select
+                multiple
+                value={forms.archiveVolume.article_ids}
                 onChange={(e) => {
                   const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                   setForm("archiveVolume", { article_ids: selected });
@@ -807,6 +834,7 @@ export const AdminJournalManagePage = () => {
           onComplete={handleCropComplete}
         />
       ) : null}
+      
     </main>
   );
 };
