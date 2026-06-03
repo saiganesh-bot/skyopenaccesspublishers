@@ -154,6 +154,7 @@ main {
 .search-box-wrapper {
   position: relative;
   width: 420px;
+  margin-left: 10%;
 }
 
 .search-box {
@@ -2919,6 +2920,7 @@ img {
   .search-box-wrapper {
     width: 100% !important;
     max-width: 480px !important;
+    margin-left: 0 !important;
   }
 
   .search-box {

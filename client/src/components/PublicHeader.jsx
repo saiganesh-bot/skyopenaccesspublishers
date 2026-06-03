@@ -98,11 +98,11 @@ export const PublicHeader = () => {
           <div className="contact">
             <span>
               <i className="fa-solid fa-phone" />
-              +91 9390535904
+              +91 7893909762
             </span>
             <span>
               <i className="fa-solid fa-envelope" />
-              skyopenaccess@gmail.com
+              contact@skyopenaccesspublishers.com
             </span>
           </div>
 

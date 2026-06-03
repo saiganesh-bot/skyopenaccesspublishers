@@ -1,7 +1,7 @@
 import { Journal } from "../models/Journal.js";
 import { Submission } from "../models/Submission.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { sendSubmissionStatusEmail } from "../utils/mailer.js";
+import { sendSubmissionStatusEmail, sendNewSubmissionNotificationEmail } from "../utils/mailer.js";
 import { uploadBufferToCloudinary } from "../utils/uploadToCloudinary.js";
 
 const parseJournalIds = (journalIdsRaw) => {
@@ -61,6 +61,9 @@ export const createSubmission = asyncHandler(async (req, res) => {
     manuscript_format: manuscriptFile.mimetype
   });
 
+  const selectedJournals = await Journal.find({ _id: { $in: journal_ids } }, "title");
+  const journalNames = selectedJournals.map((j) => j.title).join(", ");
+
   try {
     await sendSubmissionStatusEmail({
       to: submission.email,
@@ -71,6 +74,13 @@ export const createSubmission = asyncHandler(async (req, res) => {
   } catch (emailErr) {
     // eslint-disable-next-line no-console
     console.error("Failed to send submission received email", emailErr.message);
+  }
+
+  try {
+    await sendNewSubmissionNotificationEmail(submission, journalNames);
+  } catch (emailErr) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to send new submission admin notification email", emailErr.message);
   }
 
   res.status(201).json({

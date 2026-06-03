@@ -106,8 +106,8 @@ router.delete("/indexing-logos/:id", protect, adminOnly, deleteIndexingLogo);
 
 router.get("/info-table/:journal_id", getInfoTable);
 router.get("/info-table", getInfoTable);
-router.post("/info-table", protect, adminOnly, updateInfoTable);
-router.put("/info-table", protect, adminOnly, updateInfoTable);
+router.post("/info-table", protect, adminOnly, imageUpload.fields([{ name: "left_logo", maxCount: 1 }, { name: "right_logo", maxCount: 1 }]), updateInfoTable);
+router.put("/info-table", protect, adminOnly, imageUpload.fields([{ name: "left_logo", maxCount: 1 }, { name: "right_logo", maxCount: 1 }]), updateInfoTable);
 router.delete("/info-table/:journal_id", protect, adminOnly, deleteInfoTable);
 router.delete("/info-table", protect, adminOnly, deleteInfoTable);
 

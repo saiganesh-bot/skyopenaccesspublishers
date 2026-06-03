@@ -626,6 +626,33 @@ export const updateInfoTable = asyncHandler(async (req, res) => {
     alternate_email: req.body.alternate_email || ""
   };
 
+  const leftLogoFile = req.files?.left_logo?.[0];
+  const rightLogoFile = req.files?.right_logo?.[0];
+
+  if (leftLogoFile) {
+    const upload = await uploadBufferToCloudinary(leftLogoFile.buffer, {
+      folder: "journals/info-table/logos",
+      resource_type: "image"
+    });
+    if (infoTable?.left_logo_public_id) {
+      await safeDestroy(infoTable.left_logo_public_id, "image");
+    }
+    fields.left_logo_url = upload.secure_url;
+    fields.left_logo_public_id = upload.public_id;
+  }
+
+  if (rightLogoFile) {
+    const upload = await uploadBufferToCloudinary(rightLogoFile.buffer, {
+      folder: "journals/info-table/logos",
+      resource_type: "image"
+    });
+    if (infoTable?.right_logo_public_id) {
+      await safeDestroy(infoTable.right_logo_public_id, "image");
+    }
+    fields.right_logo_url = upload.secure_url;
+    fields.right_logo_public_id = upload.public_id;
+  }
+
   if (!infoTable) {
     infoTable = await InfoTable.create({ journal_id, ...fields });
   } else {
@@ -639,6 +666,12 @@ export const deleteInfoTable = asyncHandler(async (req, res) => {
   const journal_id = getValidatedObjectId(req.body.journal_id || req.query.journal_id || req.params.journal_id, "journal");
   const infoTable = await InfoTable.findOne({ journal_id });
   if (!infoTable) return res.status(404).json({ message: "Info table not found for this journal" });
+  if (infoTable.left_logo_public_id) {
+    await safeDestroy(infoTable.left_logo_public_id, "image");
+  }
+  if (infoTable.right_logo_public_id) {
+    await safeDestroy(infoTable.right_logo_public_id, "image");
+  }
   await infoTable.deleteOne();
   res.status(200).json({ message: "Info table deleted for this journal" });
 });

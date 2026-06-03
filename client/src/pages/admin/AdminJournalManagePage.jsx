@@ -47,6 +47,10 @@ export const AdminJournalManagePage = () => {
     email: "",
     alternate_email: ""
   });
+  const [leftLogoFile, setLeftLogoFile] = useState(null);
+  const [rightLogoFile, setRightLogoFile] = useState(null);
+  const [leftLogoPreview, setLeftLogoPreview] = useState("");
+  const [rightLogoPreview, setRightLogoPreview] = useState("");
   const [hasInfoTable, setHasInfoTable] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState("");
   const [cropType, setCropType] = useState(""); // "journal-cover", "ppt-thumbnail", or "video-thumbnail"
@@ -143,6 +147,8 @@ export const AdminJournalManagePage = () => {
             email: it.email || "",
             alternate_email: it.alternate_email || ""
           });
+          setLeftLogoPreview(it.left_logo_url || "");
+          setRightLogoPreview(it.right_logo_url || "");
           setHasInfoTable(true);
         }
       } catch {
@@ -158,6 +164,10 @@ export const AdminJournalManagePage = () => {
           email: "",
           alternate_email: ""
         });
+        setLeftLogoFile(null);
+        setRightLogoFile(null);
+        setLeftLogoPreview("");
+        setRightLogoPreview("");
         setHasInfoTable(false);
       }
     } catch (err) {
@@ -209,11 +219,19 @@ export const AdminJournalManagePage = () => {
     setError("");
     setInfo("");
     try {
-      const payload = {
-        journal_id: journalId,
-        ...infoTableForm
-      };
-      await http.post("/content/info-table", payload);
+      const data = new FormData();
+      data.append("journal_id", journalId);
+      Object.entries(infoTableForm).forEach(([key, val]) => {
+        data.append(key, val);
+      });
+      if (leftLogoFile) {
+        data.append("left_logo", leftLogoFile);
+      }
+      if (rightLogoFile) {
+        data.append("right_logo", rightLogoFile);
+      }
+      await http.post("/content/info-table", data);
+      await load();
       setHasInfoTable(true);
       setInfo("Info Table updated successfully.");
       window.alert("Info Table updated successfully.");
@@ -242,6 +260,10 @@ export const AdminJournalManagePage = () => {
         email: "",
         alternate_email: ""
       });
+      setLeftLogoFile(null);
+      setRightLogoFile(null);
+      setLeftLogoPreview("");
+      setRightLogoPreview("");
       setHasInfoTable(false);
       setInfo("Info Table deleted successfully.");
       window.alert("Info Table deleted successfully.");
@@ -737,6 +759,48 @@ export const AdminJournalManagePage = () => {
                 value={infoTableForm.alternate_email}
                 onChange={(e) => setInfoTableForm((prev) => ({ ...prev, alternate_email: e.target.value }))}
               />
+            </label>
+            <label style={{ gridColumn: "1 / -1" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <span style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Left Indexing Logo</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setLeftLogoFile(file);
+                        setLeftLogoPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                  {leftLogoPreview && (
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <img src={leftLogoPreview} alt="Left Logo Preview" style={{ maxHeight: "80px", maxWidth: "100%", objectFit: "contain" }} />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <span style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Right Indexing Logo</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setRightLogoFile(file);
+                        setRightLogoPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                  {rightLogoPreview && (
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <img src={rightLogoPreview} alt="Right Logo Preview" style={{ maxHeight: "80px", maxWidth: "100%", objectFit: "contain" }} />
+                    </div>
+                  )}
+                </div>
+              </div>
             </label>
             <button className="primary-btn" type="submit">
               {hasInfoTable ? "Update Info Table" : "Create Info Table"}

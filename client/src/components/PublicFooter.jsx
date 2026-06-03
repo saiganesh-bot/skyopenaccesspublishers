@@ -51,11 +51,6 @@ export const PublicFooter = () => {
               <div className="logo-icon">
                 <NavLink to="/"><img src="/images/sky-logo-final-white.png" alt="SKY Open Access Publisher" className="footer-logo-img" /></NavLink>
               </div>
-              <div>
-              
-                <h2>SKY</h2>
-                <span>OPEN ACCESS Publisher</span>
-              </div>
             </div>
 
             <p>
@@ -107,11 +102,11 @@ export const PublicFooter = () => {
             </div>
             <div className="contact-item">
               <i className="fa-solid fa-phone"></i>
-              <p>+91 9963077304</p>
+              <p>+91 78939 09762</p>
             </div>
             <div className="contact-item">
               <i className="fa-regular fa-envelope"></i>
-              <p>skyopenaccess@gmail.com</p>
+              <p>contact@skyopenaccesspublishers.com</p>
             </div>
           </div>
 
@@ -162,7 +157,7 @@ export const PublicFooter = () => {
       <div className="whatsapp-float" id="whatsapp-float">
         <span className="whatsapp-tooltip">Chat with us on WhatsApp</span>
         <a
-          href="https://wa.me/919963077304"
+          href="https://wa.me/7893909762"
           target="_blank"
           rel="noopener noreferrer"
           className="whatsapp-float-btn"

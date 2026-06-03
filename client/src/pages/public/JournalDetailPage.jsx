@@ -867,8 +867,8 @@ export const JournalDetailPage = () => {
         {/* RIGHT SIDEBAR WITH INFO TABLE */}
         <aside className="journal-info-sidebar">
           <div className="branding-logos">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar" className="scholar-logo" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/bc/ResearchGate_logo.svg" alt="ResearchGate" className="researchgate-logo" />
+            <img src={infoTable.left_logo_url || "https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg"} alt="Left Indexing Logo" className="scholar-logo" style={{ maxHeight: "50px", objectFit: "contain" }} />
+            <img src={infoTable.right_logo_url || "https://upload.wikimedia.org/wikipedia/commons/b/bc/ResearchGate_logo.svg"} alt="Right Indexing Logo" className="researchgate-logo" style={{ maxHeight: "50px", objectFit: "contain" }} />
           </div>
           <table className="info-table-element">
             <tbody>
