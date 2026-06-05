@@ -14,6 +14,10 @@ import { logger } from "./utils/logger.js";
 export const app = express();
 app.set("etag", false);
 
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1); // Trust first-hop proxy (Traefik/Nginx)
+}
+
 const configuredOrigins = String(env.clientOrigin || "")
   .split(",")
   .map((origin) => origin.trim().replace(/\/$/, ""))
