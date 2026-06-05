@@ -42,6 +42,8 @@ app.use(
       if (process.env.NODE_ENV !== "production" && isDevLoopbackOrigin(cleanOrigin)) {
         return callback(null, true);
       }
+
+      logger.warn(`CORS blocked request from origin: "${origin}". Configured origins: [${configuredOrigins.join(", ")}]`);
       return callback(null, false);
     },
     credentials: true
