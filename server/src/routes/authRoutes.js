@@ -3,7 +3,8 @@ import {
 	loginAdmin,
 	me,
 	resendAdminVerification,
-	setupFirstAdmin,
+	requestForgotPassword,
+	resetForgotPassword,
 	verifyAdminEmail,
 	verifyAdminTwoFactor
 } from "../controllers/authController.js";
@@ -12,11 +13,12 @@ import { authLoginLimiter, authVerificationLimiter } from "../middlewares/rateLi
 
 const router = Router();
 
-router.post("/setup-admin", setupFirstAdmin);
 router.post("/login", authLoginLimiter, loginAdmin);
 router.post("/verify-email", authVerificationLimiter, verifyAdminEmail);
 router.post("/resend-verification", authVerificationLimiter, resendAdminVerification);
 router.post("/verify-2fa", authVerificationLimiter, verifyAdminTwoFactor);
+router.post("/forgot-password-request", authVerificationLimiter, requestForgotPassword);
+router.post("/forgot-password-reset", authVerificationLimiter, resetForgotPassword);
 router.get("/me", protect, adminOnly, me);
 
 export default router;

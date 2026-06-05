@@ -3,7 +3,6 @@ import { AdminRoute } from "./components/AdminRoute";
 import { AdminLayout } from "./components/AdminLayout";
 import { PublicLayout } from "./components/PublicLayout";
 import { AdminContentPage } from "./pages/admin/AdminContentPage";
-import { AdminCreatePageTemp } from "./pages/admin/AdminCreatePageTemp";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminIndexingPage } from "./pages/admin/AdminIndexingPage";
 import { AdminJournalManagePage } from "./pages/admin/AdminJournalManagePage";
@@ -50,9 +49,7 @@ const App = () => {
         <Route path="/onlinesubmission" element={<Navigate to="/submit" replace />} />
       </Route>
 
-      <Route path="/admin/create-temp" element={<AdminCreatePageTemp />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
-      {/* <Route path="/admin/register" element={<AdminRegisterPage />} /> */}
       <Route
         path="/admin"
         element={

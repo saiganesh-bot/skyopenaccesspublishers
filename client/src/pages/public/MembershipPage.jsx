@@ -105,7 +105,7 @@ export const MembershipPage = () => (
             Becoming a member is simple. Choose the plan that suits you and start enjoying the
             benefits immediately.
           </p>
-          <a href="mailto:skyopenaccess@gmail.com?subject=Interested%20in%20Becoming%20a%20Member&body=Dear%20Sky%20Open%20Access%2C" className="cta-btn">
+          <a href="mailto:skyopenaccess@gmail.com" className="cta-btn">
             Contact Us
           </a>
         </div>

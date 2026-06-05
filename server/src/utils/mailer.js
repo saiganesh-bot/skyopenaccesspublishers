@@ -137,6 +137,30 @@ export const sendAdminTwoFactorCodeEmail = async ({ to, adminName, code }) => {
     return false;
   }
 };
+
+export const sendForgotPasswordEmail = async ({ to, adminName, code }) => {
+  try {
+    await sendMailgunEmail({
+      to,
+      subject: "Reset your admin password",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1d1d1d;">
+          <h2>Admin Password Reset Verification</h2>
+          <p>Hello ${adminName},</p>
+          <p>You have requested a password reset. Your verification code is <strong>${code}</strong>.</p>
+          <p>This code expires in 10 minutes.</p>
+          <p>If you did not request this, you can ignore this email.</p>
+        </div>
+      `
+    });
+    return true;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn(`Failed to send admin password reset email: ${err.message}`);
+    return false;
+  }
+};
+
 export const toDriveViewerUrl = (url) => {
   if (!url) return "";
   const encoded = encodeURIComponent(url);
