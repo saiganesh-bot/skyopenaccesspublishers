@@ -16,7 +16,7 @@ app.set("etag", false);
 
 const configuredOrigins = String(env.clientOrigin || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
 
 const isDevLoopbackOrigin = (origin) =>
@@ -27,8 +27,19 @@ app.use(
   cors({
     origin(origin, callback) {
       if (!origin) return callback(null, true);
-      if (configuredOrigins.includes(origin)) return callback(null, true);
-      if (process.env.NODE_ENV !== "production" && isDevLoopbackOrigin(origin)) {
+      
+      const cleanOrigin = origin.replace(/\/$/, "");
+      
+      // Check if it matches configured origins, allowing for www/non-www differences
+      const isMatched = configuredOrigins.some((allowed) => {
+        const normAllowed = allowed.replace(/^https?:\/\/(www\.)?/, "");
+        const normOrigin = cleanOrigin.replace(/^https?:\/\/(www\.)?/, "");
+        return normAllowed === normOrigin && allowed.split("://")[0] === cleanOrigin.split("://")[0];
+      });
+
+      if (isMatched) return callback(null, true);
+
+      if (process.env.NODE_ENV !== "production" && isDevLoopbackOrigin(cleanOrigin)) {
         return callback(null, true);
       }
       return callback(null, false);
