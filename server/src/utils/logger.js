@@ -51,18 +51,14 @@ export const logger = winston.createLogger({
   ],
 });
 
-// Add console output for development
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: combine(
-        colorize(),
-        timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        consoleFormat
-      ),
-    })
-  );
-}
+// Always output to Console (essential for Docker logs in Dokploy/ECS/Kubernetes)
+logger.add(
+  new winston.transports.Console({
+    format: process.env.NODE_ENV === "production"
+      ? combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), json())
+      : combine(colorize(), timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), consoleFormat)
+  })
+);
 
 // Stream adapter for Morgan HTTP logger integration
 logger.stream = {

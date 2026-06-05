@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1); // Trust first-hop proxy (Traefik/Nginx)
 }
 
-const configuredOrigins = String(env.clientOrigin || "")
+const configuredOrigins = String(env.CLIENT_ORIGIN || "")
   .split(",")
   .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
