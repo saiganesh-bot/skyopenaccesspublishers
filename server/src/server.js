@@ -7,6 +7,7 @@ const start = async () => {
   let isDbConnected = false;
 
   try {
+    logger.info(`Startup configuration - NODE_ENV: ${process.env.NODE_ENV}, CLIENT_ORIGIN: "${process.env.CLIENT_ORIGIN}"`);
     await connectDb(env.mongoUri);
     isDbConnected = true;
     logger.info("Database connected successfully.");
