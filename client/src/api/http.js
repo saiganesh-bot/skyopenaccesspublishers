@@ -3,9 +3,7 @@ import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 const sanitizeData = (value) => {
-  if (Array.isArray(value)) {
-    return value.filter(Boolean).map(sanitizeData);
-  }
+    return value.map(sanitizeData);
 
   if (value && typeof value === "object") {
     return Object.fromEntries(
