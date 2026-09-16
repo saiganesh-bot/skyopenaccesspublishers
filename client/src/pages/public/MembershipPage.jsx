@@ -38,7 +38,7 @@ export const MembershipPage = () => (
 
           <div className="benefit-card fade-up">
             <h3>Access to All Journals</h3>
-            <p>Unrestricted access to all journals published by MK ScienceSet.</p>
+            <p>Unrestricted access to all journals published by SKY Open Access.</p>
           </div>
 
           <div className="benefit-card fade-up">
